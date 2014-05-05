@@ -1,0 +1,21 @@
+##OpenGL GLIB
+
+GSTAP
+Perspective 70
+LookAt 1 2 8  0 0 0  0 1 0
+
+Vertex   bark.vert
+Fragment bark.frag
+Program  Bark						\
+		uKa <0. 0.1 1.0>			\
+		uKd <0. 0.6 1.0>			\
+		uKs <0. 0.3 1.0>			\
+		uShininess <3. 10. 1000.>	\
+		uLightX <-20. 5. 20.>   	\
+		uLightY <-20. 10. 20.>		\
+		uLightZ <-20. 20. 20.>		\
+		divisions <1 4 8>			\
+		uColor {.62 .37 .18 1.}		\
+		uSpecularColor {1. 1. 1. 1.}								
+
+Cylinder 1 2 512 512
