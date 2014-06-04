@@ -13,12 +13,12 @@ uniform float uNoiseFreq;
 uniform sampler3D Noise3;
 
 uniform float divisions;
+uniform float barkRatio;
+uniform float barkHeight;
 
-const float radius = 4.0;
 const float pi = 3.14159;
 
-flat out vec4 tmpColor;
-flat out float useColor;
+flat out vec2 vST;
 
 //Lighting vectors for fragment shader
 flat out vec3 vNs;
@@ -28,8 +28,8 @@ flat out vec3 vPVs;
 
 void main( )
 {
-	useColor = 0.0;
 	vec4 tmpVert = gl_Vertex;
+	vST = gl_MultiTexCoord0.st;
 	
 	//Noise
 	vec4  nv  = texture3D( Noise3, uNoiseFreq * tmpVert.xyz );
@@ -37,30 +37,22 @@ void main( )
 	n = ( n - 2. );				// -1. -> 1.
 	float delta = uNoiseMag * n;
 	
-	//Angle from the center
-	float theta = atan(gl_Vertex.x, gl_Vertex.y);
+	float chunkSize = 1.0/floor(divisions);
 	
-	float thetaDivision = floor(divisions/pi*theta);
-	
-	//Push out vertices
-	if(mod(thetaDivision, 2) == 0)
+	if(fract(vST.s/ chunkSize) < barkRatio)
 	{
-		//tmpColor = vec4(1.0, 1.0, 1.0, 1.0);
-		//useColor = 1.0;
-		tmpVert.x*= 1.25;
-		tmpVert.y*= 1.25;
+		tmpVert.x*= barkHeight;
+		tmpVert.z*= barkHeight;
 	}
 	
 	//Add noise to vertices
 	tmpVert.x*= 1+delta;
-	tmpVert.y*= 1+delta;
-	//tmpVert.z*= 1+delta;	//This makes everything point upwards
+	tmpVert.z*= 1+delta;
 	
-	
-	vec4 ECposition = uModelViewMatrix * gl_Vertex;
+	vec4 ECposition = gl_ModelViewMatrix * tmpVert;
 	vec3 eyeLightPosition = vec3( uLightX, uLightY, uLightZ );
 
-	vNs = normalize( uNormalMatrix * aNormal );	// surface normal vector
+	vNs = normalize( gl_NormalMatrix * gl_Normal );	// surface normal vector
 	vLs = eyeLightPosition - ECposition.xyz;		// vector from the point to the light
 	vEs = vec3( 0., 0., 0. ) - ECposition.xyz;		// vector from the point
 
@@ -87,5 +79,5 @@ void main( )
 
 	vPVs = ambient.rgb + diffuse.rgb + specular.rgb;
 
-	gl_Position = uModelViewProjectionMatrix * tmpVert;
+	gl_Position = gl_ModelViewProjectionMatrix * tmpVert;
 }

@@ -1,6 +1,5 @@
 ##OpenGL GLIB
 
-GSTAP
 Perspective 70
 LookAt 1 2 8  0 0 0  0 1 0
 
@@ -17,6 +16,8 @@ Program  Bark						\
 		uLightY <-20. 10. 20.>		\
 		uLightZ <-20. 20. 20.>		\
 		divisions <1. 4. 16.>		\
+		barkRatio <.01 .5 1.>		\
+		barkHeight <1.0 1.15 1.5>	\
 		uColor {.62 .37 .18 1.}		\
 		uSpecularColor {1. 1. 1. 1.}								
 

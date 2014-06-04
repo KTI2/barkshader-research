@@ -5,15 +5,14 @@ uniform vec4  uColor;
 uniform vec4  uSpecularColor;
 uniform float uShininess;
 
-flat in vec4 tmpColor;
-flat in float useColor;
+flat in vec2 vST;
 
 flat in vec3 vNs;
 flat in vec3 vLs;
 flat in vec3 vEs;
 flat in vec3 vPVs;
 
-layout(location=0) out vec4 fFragColor;
+//layout(location=0) out vec4 fFragColor;
 
 void main( )
 {
@@ -38,9 +37,5 @@ void main( )
 	}
 	vec4 specular = uKs * s * uSpecularColor;
 
-	fFragColor = vec4( ambient.rgb + diffuse.rgb + specular.rgb, 1. );
-	
-	if(useColor >= 1.0)
-		fFragColor = tmpColor;
-
+	gl_FragColor = vec4( ambient.rgb + diffuse.rgb + specular.rgb, 1. );
 }
