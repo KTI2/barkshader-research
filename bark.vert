@@ -16,6 +16,10 @@ uniform float divisions;
 uniform float barkRatio;
 uniform float barkHeight;
 
+const int cylinderS = 512;
+const int cylinderT = 512;
+const float radius = 1.0;
+
 const float pi = 3.14159;
 
 flat out vec2 vST;
@@ -26,33 +30,65 @@ flat out vec3 vLs;
 flat out vec3 vEs;
 flat out vec3 vPVs;
 
-void main( )
+float getNoise(vec4 point) {
+	vec4  nv  = texture3D( Noise3, uNoiseFreq * point.xyz );
+	float n = nv.r + nv.g + nv.b + nv.a;	// 1. -> 3.
+	n = ( n - 2. );				// -1. -> 1.
+	return uNoiseMag * n;
+}
+
+//Converts a point to new bark form
+vec4 convertPoint(vec4 point) {
+	float chunkSize = 1.0/floor(divisions);
+	float fracts = fract(vST.s/chunkSize);
+	
+	//Chunk to raise
+	if(fracts < barkRatio)
+	{	
+		point.x*= barkHeight;
+		point.z*= barkHeight;
+	}
+	
+	float delta = getNoise(point);
+	
+	//Add noise to vertices
+	point.x*= 1+delta;
+	point.z*= 1+delta;
+	
+	return point;
+}
+
+void main()
 {
 	vec4 tmpVert = gl_Vertex;
 	vST = gl_MultiTexCoord0.st;
 	
-	//Noise
-	vec4  nv  = texture3D( Noise3, uNoiseFreq * tmpVert.xyz );
-	float n = nv.r + nv.g + nv.b + nv.a;	// 1. -> 3.
-	n = ( n - 2. );				// -1. -> 1.
-	float delta = uNoiseMag * n;
+	float theta = atan(gl_Vertex.x, gl_Vertex.z);
 	
-	float chunkSize = 1.0/floor(divisions);
+	//Get the up vector
+	vec4 upVector = tmpVert;
+	upVector.y += (1.0/cylinderT);
+	upVector = convertPoint(upVector);
 	
-	if(fract(vST.s/ chunkSize) < barkRatio)
-	{
-		tmpVert.x*= barkHeight;
-		tmpVert.z*= barkHeight;
-	}
+	//Get the right vector
+	vec4 rightVector = tmpVert;
+	float thetaR = theta + 2*pi/cylinderS;
 	
-	//Add noise to vertices
-	tmpVert.x*= 1+delta;
-	tmpVert.z*= 1+delta;
+	rightVector.x = radius*sin(thetaR);
+	rightVector.z = radius*cos(thetaR);
+	rightVector = convertPoint(rightVector);
+	
+	vec3 newNormal = cross(upVector.xyz, rightVector.xyz);
+	
+	//Get current point
+	tmpVert = convertPoint(tmpVert);
 	
 	vec4 ECposition = gl_ModelViewMatrix * tmpVert;
 	vec3 eyeLightPosition = vec3( uLightX, uLightY, uLightZ );
 
-	vNs = normalize( gl_NormalMatrix * gl_Normal );	// surface normal vector
+	vNs = newNormal;
+	
+	//vNs = gl_NormalMatrix * gl_Normal;	// surface normal vector
 	vLs = eyeLightPosition - ECposition.xyz;		// vector from the point to the light
 	vEs = vec3( 0., 0., 0. ) - ECposition.xyz;		// vector from the point
 
