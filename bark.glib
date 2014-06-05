@@ -7,7 +7,7 @@ Vertex   bark.vert
 Fragment bark.frag
 Program  Bark						\
 		uNoiseMag <0. .15 .5> 		\
-		uNoiseFreq <0. 3. 6.>		\
+		uNoiseFreq <0. 1.5 6.>		\
 		uKa <0. 0.1 1.0>			\
 		uKd <0. 0.6 1.0>			\
 		uKs <0. 0.3 1.0>			\
@@ -15,8 +15,8 @@ Program  Bark						\
 		uLightX <-20. 5. 20.>   	\
 		uLightY <-20. 10. 20.>		\
 		uLightZ <-20. 20. 20.>		\
-		divisions <1. 4. 16.>		\
-		barkRatio <.01 .5 1.>		\
+		divisions <1. 10. 16.>		\
+		barkRatio <.01 .75 1.>		\
 		barkHeight <1.0 1.15 1.5>	\
 		uColor {.62 .37 .18 1.}		\
 		uSpecularColor {1. 1. 1. 1.}								

@@ -19,6 +19,7 @@ uniform float barkHeight;
 const int cylinderS = 512;
 const int cylinderT = 512;
 const float radius = 1.0;
+const float height = 2.0;
 
 const float pi = 3.14159;
 
@@ -67,8 +68,14 @@ void main()
 	
 	//Get the up vector
 	vec4 upVector = tmpVert;
-	upVector.y += (1.0/cylinderT);
-	upVector = convertPoint(upVector);
+	
+	if(upVector.y >= 2.0) {
+		upVector.x = 0.0;
+		upVector.z = 0.0;
+	} else {
+		upVector.y += (1.0/cylinderT);
+		upVector = convertPoint(upVector);
+	}
 	
 	//Get the right vector
 	vec4 rightVector = tmpVert;
