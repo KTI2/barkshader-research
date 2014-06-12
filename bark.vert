@@ -46,8 +46,26 @@ vec4 convertPoint(vec4 point) {
 	//Chunk to raise
 	if(fracts < barkRatio)
 	{	
-		point.x*= barkHeight;
-		point.z*= barkHeight;
+		float rampCoef = fracts / barkRatio;
+
+		if(rampCoef > .8) {
+			rampCoef = (rampCoef-1.0)*(-1.0)+.8; //Reverses the range
+			
+			rampCoef = (rampCoef-.8)*5.0; //Puts it from 0.0->1.0
+			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->bakHeight
+			
+			point.x*= rampCoef;
+			point.z*= rampCoef;
+		} else if(rampCoef < .2) {
+			rampCoef = rampCoef*5.0; //Puts it from 0.0->1.0
+			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->bakHeight
+			
+			point.x*= rampCoef;
+			point.z*= rampCoef;
+		} else {
+			point.x*= barkHeight;
+			point.z*= barkHeight;
+		}
 	}
 	
 	float delta = getNoise(point);
@@ -112,15 +130,7 @@ void main()
 	float d = max( dot(Normal,Light), 0. );
 	vec4 diffuse = uKd * d * uColor;
 
-	float s = 0.;
-	if( dot(Normal,Light) > 0. )		// only do specular if the light can see the point
-	{
-		vec3 ref = normalize( 2. * Normal * dot(Normal,Light) - Light );
-		s = pow( max( dot(Eye,ref),0. ), uShininess );
-	}
-	vec4 specular = uKs * s * uSpecularColor;
-
-	vPVs = ambient.rgb + diffuse.rgb + specular.rgb;
+	vPVs = ambient.rgb + diffuse.rgb; // + specular.rgb;
 
 	gl_Position = gl_ModelViewProjectionMatrix * tmpVert;
 }
