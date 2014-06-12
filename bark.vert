@@ -2,10 +2,6 @@
 
 //Lighting
 uniform float uLightX, uLightY, uLightZ;
-uniform float uKa, uKd, uKs;
-uniform vec4  uColor;
-uniform vec4  uSpecularColor;
-uniform float uShininess;
 
 //Noise
 uniform float uNoiseMag;
@@ -26,10 +22,9 @@ const float pi = 3.14159;
 flat out vec2 vST;
 
 //Lighting vectors for fragment shader
-flat out vec3 vNs;
 flat out vec3 vLs;
 flat out vec3 vEs;
-flat out vec3 vPVs;
+flat out vec3 vNs;
 
 float getNoise(vec4 point) {
 	vec4  nv  = texture3D( Noise3, uNoiseFreq * point.xyz );
@@ -102,35 +97,17 @@ void main()
 	rightVector.x = radius*sin(thetaR);
 	rightVector.z = radius*cos(thetaR);
 	rightVector = convertPoint(rightVector);
-	
-	vec3 newNormal = cross(upVector.xyz, rightVector.xyz);
-	
+		
 	//Get current point
 	tmpVert = convertPoint(tmpVert);
+	
+	vNs = cross(upVector.xyz, rightVector.xyz);
 	
 	vec4 ECposition = gl_ModelViewMatrix * tmpVert;
 	vec3 eyeLightPosition = vec3( uLightX, uLightY, uLightZ );
 
-	vNs = newNormal;
-	
-	//vNs = gl_NormalMatrix * gl_Normal;	// surface normal vector
 	vLs = eyeLightPosition - ECposition.xyz;		// vector from the point to the light
 	vEs = vec3( 0., 0., 0. ) - ECposition.xyz;		// vector from the point
-
-	vec3 Normal;
-	vec3 Light;
-	vec3 Eye;
-
-	Normal = normalize(vNs);
-	Light =  normalize(vLs);
-	Eye =    normalize(vEs);
-
-	vec4 ambient = uKa * uColor;
-
-	float d = max( dot(Normal,Light), 0. );
-	vec4 diffuse = uKd * d * uColor;
-
-	vPVs = ambient.rgb + diffuse.rgb; // + specular.rgb;
 
 	gl_Position = gl_ModelViewProjectionMatrix * tmpVert;
 }
