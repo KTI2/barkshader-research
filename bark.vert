@@ -48,17 +48,17 @@ vec4 convertPoint(vec4 point) {
 	{	
 		float rampCoef = fracts / barkRatio;
 
-		if(rampCoef > .8) {
+		if(rampCoef > .8) { //If the point is within 20% to being a non bark, make a ramp
 			rampCoef = (rampCoef-1.0)*(-1.0)+.8; //Reverses the range
 			
 			rampCoef = (rampCoef-.8)*5.0; //Puts it from 0.0->1.0
-			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->bakHeight
+			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->barkHeight
 			
 			point.x*= rampCoef;
 			point.z*= rampCoef;
 		} else if(rampCoef < .2) {
 			rampCoef = rampCoef*5.0; //Puts it from 0.0->1.0
-			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->bakHeight
+			rampCoef = rampCoef/(1.0/(barkHeight-1.0))+1.0; //Goes from 1.0->barkHeight
 			
 			point.x*= rampCoef;
 			point.z*= rampCoef;
